@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-# Use the official Python image as a base
-FROM python:3.9-slim
-
-WORKDIR /app
-
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 5000
-
-CMD ["python", "app.py"]
-=======
 # Use an official Python runtime as the base image
 FROM python:3.9-slim
 
@@ -34,4 +18,3 @@ EXPOSE 5000
 
 # Define the command to run your application
 CMD [ "python", "app.py" ]
->>>>>>> 07135de9b5258eebac02692832b910ba23c35eb0
