@@ -28,12 +28,19 @@
                     "Content-Type": "application/json"
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok.');
+            })
             .then(data => {
                 document.getElementById("message").innerHTML = data.message;
+                document.getElementById("name").value = "";
+                document.getElementById("email").value = "";
             })
             .catch(error => {
-                console.error("Error:", error);
+                document.getElementById("message").innerHTML = "Error: " + error.message;
             });
         });
     </script>
