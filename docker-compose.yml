@@ -7,13 +7,15 @@ services:
       - "5000:5000"
     depends_on:
       - mongo
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/
+    env_file:
+      - .env
 
   frontend:
     build: ./Frontend
     ports:
       - "80:80"
+    env_file:
+      - .env
 
   mongo:
     image: mongo
