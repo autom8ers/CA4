@@ -1,7 +1,17 @@
 pipeline {
     agent any
     
+    environment {
+        DOCKER_REGISTRY_CREDENTIALS = credentials('autom8ers-dockerhub')
+    }
+    
     stages {
+        stage('Docker Login') {
+            steps {
+                sh 'echo $DOCKER_REGISTRY_CREDENTIALS | docker login -u DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
+            }
+        }
+        
         stage('Build and Push Frontend Docker Image') {
             steps {
                 dir('Frontend') {
@@ -14,6 +24,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Build and Push Backend Docker Image') {
             steps {
                 dir('Backend') {
@@ -24,6 +35,12 @@ pipeline {
                         sh 'docker push autom8ers/backend-image:latest'
                     }
                 }
+            }
+        }
+        
+        stage('Docker Logout') {
+            steps {
+                sh 'docker logout'
             }
         }
     }
