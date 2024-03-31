@@ -1,10 +1,6 @@
 pipeline {
     agent any
     
-    environment {
-        DOCKER_REGISTRY_CREDENTIALS = credentials('autom8ers-dockerhub')
-    }
-    
     stages {
         stage('Docker Login') {
             steps {
