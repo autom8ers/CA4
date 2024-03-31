@@ -8,7 +8,15 @@ pipeline {
     stages {
         stage('Docker Login') {
             steps {
-                sh 'echo $DOCKER_REGISTRY_CREDENTIALS | docker login --username autom8ers --password-stdin'
+                script {
+                    // Extract username and password from credentials
+                    def creds = credentials('autom8ers-dockerhub')
+                    def username = creds.getUsername()
+                    def password = creds.getPassword()
+                    
+                    // Use username and password to login to Docker
+                    sh "echo ${password} | docker login --username ${username} --password-stdin"
+                }
             }
         }
         
