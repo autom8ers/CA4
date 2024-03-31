@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Docker Login') {
             steps {
-                sh 'echo $DOCKER_REGISTRY_CREDENTIALS | docker login -u DOCKER_REGISTRY_CREDENTIALS_USR --password-stdin'
+                sh 'echo $DOCKER_REGISTRY_CREDENTIALS | docker login --username autom8ers --password-stdin'
             }
         }
         
