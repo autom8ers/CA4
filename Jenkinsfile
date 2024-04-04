@@ -7,22 +7,31 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('autom8ers-dockerhub')        
     }
     stages {
-        stage('Build') {
+        stage('Pulling MongoDB Image') {
             steps {
                 script {
-                    sh "docker build -t autom8ers/autom8ers:${env.BUILD_NUMBER} ."
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        docker.image('mongo:latest').pull()
+                    }
                 }
             }
         }
-        stage('Push') {
+        stage('Building MongoDB Image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'autom8ers-dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh "docker login -u $USERNAME -p $PASSWORD"
-                        sh "docker push autom8ers/autom8ers:${env.BUILD_NUMBER}"
+                    docker.build('autom8ers/mongo:latest', '.')
+                }
+            }
+        }
+        stage('Pushing MongoDB Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        docker.image('autom8ers/mongo:latest').push()
                     }
                 }
             }
         }
     }
 }
+
