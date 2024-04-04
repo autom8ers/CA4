@@ -1,27 +1,25 @@
 pipeline {
     agent any
-    
-    environment {
-        DOCKER_HUB_USERNAME = credentials('autom8ers')
-        DOCKER_HUB_PASSWORD = credentials('Salis2002$')
-        DOCKER_HUB_REPO = 'autom8ers/mongodb'
-        DOCKER_IMAGE_TAG = 'latest'
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
     }
-    
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('autom8ers-dockerhub')        
+    }
     stages {
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
                 script {
-                    docker.build("${DOCKER_HUB_REPO}:${DOCKER_IMAGE_TAG}", "./path/to/your/Dockerfile")
+                    sh "docker build -t autom8ers/autom8ers:${env.BUILD_NUMBER} ."
                 }
             }
         }
-        
-        stage('Push Docker Image to Docker Hub') {
+        stage('Push') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_USERNAME, DOCKER_HUB_PASSWORD) {
-                        docker.image("${DOCKER_HUB_REPO}:${DOCKER_IMAGE_TAG}").push()
+                    withCredentials([usernamePassword(credentialsId: 'autom8ers-dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "docker login -u $USERNAME -p $PASSWORD"
+                        sh "docker push autom8ers/autom8ers:${env.BUILD_NUMBER}"
                     }
                 }
             }
