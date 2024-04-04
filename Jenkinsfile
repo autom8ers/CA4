@@ -1,50 +1,29 @@
 pipeline {
     agent any
     
+    environment {
+        DOCKER_HUB_USERNAME = credentials('autom8ers')
+        DOCKER_HUB_PASSWORD = credentials('Salis2002$')
+        DOCKER_HUB_REPO = 'autom8ers/mongodb'
+        DOCKER_IMAGE_TAG = 'latest'
+    }
+    
     stages {
-        stage('Docker Login') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // Extract username and password from credentials
-                    def creds = credentials('autom8ers-dockerhub')
-                    def username = creds.getUsername()
-                    def password = creds.getPassword()
-                    
-                    // Use username and password to login to Docker
-                    sh "echo ${password} | docker login --username ${username} --password-stdin"
+                    docker.build("${DOCKER_HUB_REPO}:${DOCKER_IMAGE_TAG}", "./path/to/your/Dockerfile")
                 }
             }
         }
         
-        stage('Build and Push Frontend Docker Image') {
+        stage('Push Docker Image to Docker Hub') {
             steps {
-                dir('Frontend') {
-                    script {
-                        // Build the frontend Docker image
-                        sh 'docker build -t autom8ers/frontend-image:latest .'
-                        // Push the frontend Docker image to Docker Hub
-                        sh 'docker push autom8ers/frontend-image:latest'
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_USERNAME, DOCKER_HUB_PASSWORD) {
+                        docker.image("${DOCKER_HUB_REPO}:${DOCKER_IMAGE_TAG}").push()
                     }
                 }
-            }
-        }
-        
-        stage('Build and Push Backend Docker Image') {
-            steps {
-                dir('Backend') {
-                    script {
-                        // Build the backend Docker image
-                        sh 'docker build -t autom8ers/backend-image:latest .'
-                        // Push the backend Docker image to Docker Hub
-                        sh 'docker push autom8ers/backend-image:latest'
-                    }
-                }
-            }
-        }
-        
-        stage('Docker Logout') {
-            steps {
-                sh 'docker logout'
             }
         }
     }
