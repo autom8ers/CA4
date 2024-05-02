@@ -16,6 +16,7 @@ pipeline {
             }
         }
         
+     //adding frontend   
         stage('Build and Push Frontend Docker Image') {
             steps {
                 dir('Frontend') {
